@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 public class HttpClient {
 
     private static final String JSON_CONTENT_TYPE = "application/json";
+
+    private static final String CONTENT_TYPE = "Content-Type";
     private final Serializer serializer = new Serializer();
     private final OkHttpClient client;
     private URL basePath;
@@ -34,7 +36,7 @@ public class HttpClient {
             builder.addInterceptor(interceptor);
         }
 
-        this.defaultHeaders.put("Content-Type", JSON_CONTENT_TYPE);
+        this.defaultHeaders.put(CONTENT_TYPE, JSON_CONTENT_TYPE);
         this.client = builder
             .connectTimeout(600, TimeUnit.SECONDS)
             .writeTimeout(600, TimeUnit.SECONDS)
@@ -50,9 +52,8 @@ public class HttpClient {
             headerParams.forEach((key, value) -> headers.merge(key, value, (v1, v2) -> v1.equalsIgnoreCase(v2) ? v1 : v1 + ", " + v2));
         }
 
-        URL url = new URL(basePath, path);
-
-        String contentType = headers.get("Content-Type");
+        HttpUrl url = this.buildUrl(path, queryStringParams);
+        String contentType = headers.get(CONTENT_TYPE);
 
         if (!HttpMethod.permitsRequestBody(method)) {
             requestBody = null;
@@ -75,6 +76,25 @@ public class HttpClient {
 
         Request request = reqBuilder.method(method, requestBody).build();
         return client.newCall(request);
+    }
+
+    public HttpUrl buildUrl(String path, Map<String, String> queryParams) throws UnsupportedEncodingException {
+        HttpUrl.Builder httpBuilder = Objects.requireNonNull(HttpUrl.parse(basePath.toString()))
+            .newBuilder()
+            .addPathSegment(path);
+
+        if (queryParams == null) {
+            return httpBuilder.build();
+        }
+
+        for (Map.Entry<String, String> entry : queryParams.entrySet()) {
+            String key = URLEncoder.encode(entry.getKey(), "UTF-8");
+            String value = URLEncoder.encode(entry.getValue(), "UTF-8");
+            httpBuilder.addQueryParameter(key, value);
+        }
+
+        return httpBuilder.build();
+
     }
 
     public RequestBody serialize(Object obj, String contentType) throws JsonProcessingException {
@@ -122,7 +142,7 @@ public class HttpClient {
             return null;
         }
 
-        String contentType = response.headers().get("Content-Type");
+        String contentType = response.headers().get(CONTENT_TYPE);
 
         if (contentType == null) {
             contentType = JSON_CONTENT_TYPE;

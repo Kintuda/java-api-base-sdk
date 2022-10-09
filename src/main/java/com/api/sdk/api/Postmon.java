@@ -16,7 +16,7 @@ public class Postmon {
     }
 
     public PostmonCEPResponse getCepInformation(String cep) throws IOException, SDKException {
-        Call request = this.httpClient.buildRequest(String.format("cep/%s", cep), "GET", null, null);
+        Call request = this.httpClient.buildRequest(String.format("cep/%s", cep), "GET", null, null, null);
         Response response = request.execute();
 
         if (response.isSuccessful()) {
