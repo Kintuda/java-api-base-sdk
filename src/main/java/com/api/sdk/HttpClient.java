@@ -1,5 +1,6 @@
 package com.api.sdk;
 
+import com.api.sdk.constants.HttpMethods;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;
@@ -58,7 +59,7 @@ public class HttpClient {
         if (!HttpMethod.permitsRequestBody(method)) {
             requestBody = null;
         } else if (body == null) {
-            if ("DELETE".equals(method)) {
+            if (HttpMethods.DELETE.equals(method)) {
                 requestBody = null;
             } else {
                 requestBody = RequestBody.create("", MediaType.parse(contentType));
@@ -181,22 +182,5 @@ public class HttpClient {
 
     public void setBasePath(URL basePath) {
         this.basePath = basePath;
-    }
-
-    private String urlEncodeMap(Map<String, String> map) throws UnsupportedEncodingException {
-        StringBuilder sb = new StringBuilder();
-
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (sb.length() > 0) {
-                sb.append("&");
-            }
-
-            String key = URLEncoder.encode(entry.getKey(), "UTF-8");
-            String value = URLEncoder.encode(entry.getValue(), "UTF-8");
-
-            sb.append(String.format("%s=%s", key, value));
-        }
-
-        return sb.toString();
     }
 }

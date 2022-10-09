@@ -2,6 +2,7 @@ package com.api.sdk.api;
 
 import com.api.sdk.HttpClient;
 import com.api.sdk.SDKException;
+import com.api.sdk.constants.HttpMethods;
 import com.api.sdk.model.PostmonCEPResponse;
 import okhttp3.Call;
 import okhttp3.Response;
@@ -16,7 +17,7 @@ public class Postmon {
     }
 
     public PostmonCEPResponse getCepInformation(String cep) throws IOException, SDKException {
-        Call request = this.httpClient.buildRequest(String.format("cep/%s", cep), "GET", null, null, null);
+        Call request = this.httpClient.buildRequest(String.format("cep/%s", cep), HttpMethods.GET, null, null, null);
         Response response = request.execute();
 
         if (response.isSuccessful()) {
