@@ -1,18 +1,18 @@
 package com.api.sdk.api;
 
 import com.api.sdk.HttpClient;
-import okhttp3.Interceptor;
 
+import java.net.URL;
 import java.util.Collections;
-import java.util.List;
 
 public final class BaseSDK {
     private final HttpClient client;
 
     private Postmon postmon;
 
-    public BaseSDK() {
-        this.client = new HttpClient(Collections.<Interceptor>emptyList());
+    public BaseSDK(URL basePath) {
+        this.client = new HttpClient(Collections.emptyList());
+        this.client.setBasePath(basePath);
         this.init();
     }
 
